@@ -30,3 +30,21 @@ export async function POST(
         return NextResponse.json({ success: false, error: error });
     }
 }
+
+export async function GET(req: NextRequest, { params }: { params: { projectId: string } }) {
+    const projectId = parseInt(params?.projectId)
+    try {
+        const data = await prisma.task.findMany({
+            where: {
+                projectId: projectId
+            }
+        })
+        if (data.length === 0) {
+            return NextResponse.json({ success: false, error: 'No tasks on that project' }, { status: 404 })
+        }
+        return NextResponse.json({ success: true, data: data })
+    } catch (error) {
+        return NextResponse.json({ success: false, error: error });
+    }
+
+}
