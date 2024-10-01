@@ -24,3 +24,22 @@ export async function POST(
     return NextResponse.json({ success: false, error: error });
   }
 }
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { userId: string } }
+) {
+  const id = parseInt(params?.userId);
+  try {
+    const projects = await prisma.project.findMany({ where: { userId: id } });
+    if (!projects) {
+      return NextResponse.json(
+        { success: false, error: 'No projects found' },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({ success: true, data: projects });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error });
+  }
+}
