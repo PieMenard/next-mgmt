@@ -1,3 +1,5 @@
+//users/[userId]/projects
+
 import { prisma } from '@/utils/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
