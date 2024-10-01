@@ -51,3 +51,29 @@ export async function PUT(
     return NextResponse.json({ success: false, error: error });
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { userId: string; projectId: string } }
+) {
+  try {
+    const project = await prisma.project.delete({
+      where: {
+        id: parseInt(params.projectId),
+        userId: parseInt(params.userId),
+      },
+    });
+    if (!project) {
+      return NextResponse.json(
+        { success: false, error: 'Project not found' },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json({
+      success: true,
+      message: `deleted ${project.name}`,
+    });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: error });
+  }
+}
