@@ -26,7 +26,6 @@ export async function GET(
     }
 }
 
-
 export async function PUT(
     req: NextRequest,
     { params }: { params: { projectId: string, taskId: string } }
@@ -53,6 +52,30 @@ export async function PUT(
             );
         }
         return NextResponse.json({ success: true, data: task });
+    } catch (error) {
+        return NextResponse.json({ success: false, error: error });
+    }
+}
+
+
+export async function DELETE(
+    req: NextRequest,
+    { params }: { params: { projectId: string, taskId: string } }
+) {
+    try {
+        const task = await prisma.task.delete({
+            where: {
+                id: parseInt(params.taskId),
+                projectId: parseInt(params.projectId),
+            },
+        });
+        if (!task) {
+            return NextResponse.json(
+                { success: false, error: 'Task not found' },
+                { status: 404 }
+            );
+        }
+        return NextResponse.json({ success: true, message: `deleted ${task.name}` });
     } catch (error) {
         return NextResponse.json({ success: false, error: error });
     }
