@@ -8,6 +8,7 @@ export async function POST(
     { params }: { params: { userId: string, projectId: string } }
 ) {
     const projectId = parseInt(params?.projectId);
+
     try {
         const data = await req.json();
         const task = await prisma.task.create({
@@ -32,15 +33,33 @@ export async function POST(
 }
 
 export async function GET(req: NextRequest, { params }: { params: { projectId: string } }) {
-    const projectId = parseInt(params?.projectId)
+    const projectId = params?.projectId
+
+    const { searchParams } = new URL(req.url);
+
+    const complexityFilter = searchParams.get('complexity')
+    const priorityFilter = searchParams.get('priority')
+
+    const filters: any = {}
+
+    if (projectId) {
+        filters.projectId = parseInt(projectId)
+    }
+    if (complexityFilter) {
+        filters.complexityLevel = parseInt(complexityFilter)
+    }
+    if (priorityFilter) {
+        filters.priority = parseInt(priorityFilter)
+    }
+
     try {
         const data = await prisma.task.findMany({
-            where: {
-                projectId: projectId
-            }
+            where:
+                filters
+
         })
         if (data.length === 0) {
-            return NextResponse.json({ success: false, error: 'No tasks on that project' }, { status: 404 })
+            return NextResponse.json({ success: false, error: 'No tasks found' }, { status: 404 })
         }
         return NextResponse.json({ success: true, data: data })
     } catch (error) {
